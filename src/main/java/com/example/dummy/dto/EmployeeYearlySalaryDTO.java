@@ -2,27 +2,24 @@ package com.example.dummy.dto;
 
 import java.io.File;
 
-public class EmployeeDTO {
-
+public class EmployeeYearlySalaryDTO {
     private Long id;
     private String employee_name;
     private Double employee_salary;
     private int employee_age;
     private File profile_image;
 
-    public EmployeeDTO(){}
+    private Double employee_yearly_salary;
 
-    public EmployeeDTO(Long id, String name) {
-        this.id = id;
-        this.employee_name = name;
-    }
+    public EmployeeYearlySalaryDTO() {}
 
-    public EmployeeDTO(Long id, String employee_name, Double employee_salary, int employee_age, File profile_image) {
+    public EmployeeYearlySalaryDTO(Long id, String employee_name, Double employee_salary, int employee_age, File profile_image, Double employee_yearly_salary) {
         this.id = id;
         this.employee_name = employee_name;
         this.employee_salary = employee_salary;
         this.employee_age = employee_age;
         this.profile_image = profile_image;
+        this.employee_yearly_salary = employee_yearly_salary;
     }
 
     public Long getId() {
@@ -63,5 +60,13 @@ public class EmployeeDTO {
 
     public void setProfile_image(File profile_image) {
         this.profile_image = profile_image;
+    }
+
+    public Double getEmployee_yearly_salary() {
+        return employee_yearly_salary;
+    }
+
+    public void setEmployee_yearly_salary(Double employee_yearly_salary) {
+        this.employee_yearly_salary = employee_yearly_salary;
     }
 }

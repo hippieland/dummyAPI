@@ -20,10 +20,10 @@ import static org.mockito.Mockito.*;
 public class EmployeeControllerTest {
 
     @InjectMocks
-    EmployeeController employeeController;
+    private EmployeeController employeeController;
 
     @Mock
-    EmployeeService employeeService;
+    private EmployeeService employeeService;
 
     @BeforeEach
     public void setUp() { MockitoAnnotations.openMocks(this);}

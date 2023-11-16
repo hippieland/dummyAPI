@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -31,36 +30,47 @@ public class EmployeeAPIService {
     public List<EmployeeDTO> getAllEmployees() {
 
         String url = baseUrl + "/employees";
-        String jsonResponse = restTemplate.getForObject(url, String.class);
 
         try
         {
+            String jsonResponse = restTemplate.getForObject(url, String.class);
             JsonNode jsonNode = objectMapper.readTree(jsonResponse);
             JsonNode dataNode = jsonNode.get("data");
-            List<EmployeeDTO> employees  = objectMapper
-                    .readValue(dataNode.toString(), new TypeReference<List<EmployeeDTO>>() {});
-
-            return employees;
+            return objectMapper.readValue(dataNode.toString(), new TypeReference<>() {});
+        }
+        catch (HttpClientErrorException e) {
+            int statusCode = e.getRawStatusCode();
+            String statusText = e.getStatusText();
+            System.err.println("Client error - Status Code: " + statusCode + ", Status Text: " + statusText);
+            throw new HttpClientErrorException(e.getStatusCode(), statusText);
         }
         catch (Exception e) {
             throw new RuntimeException("Error while deserializing JSON response", e);
         }
-
     }
 
     public EmployeeDTO getEmployeeById(long id) {
         String url = baseUrl + "/employee/" + id;
-        String jsonResponse = restTemplate.getForObject(url, String.class);
-        try
-        {
+        try{
+
+            String jsonResponse = restTemplate.getForObject(url, String.class);
+            return parseEmployeeDTO(jsonResponse);
+
+        } catch (HttpClientErrorException e) {
+            int statusCode = e.getRawStatusCode();
+            String statusText = e.getStatusText();
+            System.err.println("Client error - Status Code: " + statusCode + ", Status Text: " + statusText);
+            throw new HttpClientErrorException(e.getStatusCode(), statusText);
+        }
+    }
+
+    private EmployeeDTO parseEmployeeDTO(String jsonResponse) {
+         try{
             JsonNode jsonNode = objectMapper.readTree(jsonResponse);
             JsonNode dataNode = jsonNode.get("data");
-            EmployeeDTO employee  = objectMapper
-                    .readValue(dataNode.toString(), new TypeReference<EmployeeDTO>() {});
+            return objectMapper.readValue(dataNode.toString(), new TypeReference<>() {});
 
-            return employee;
-        }
-        catch (Exception e) {
+        }catch (Exception e) {
             throw new RuntimeException("Error while deserializing JSON response", e);
         }
     }
