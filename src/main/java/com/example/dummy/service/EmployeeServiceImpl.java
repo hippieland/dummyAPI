@@ -5,10 +5,10 @@ import com.example.dummy.dto.EmployeeYearlySalaryDTO;
 import com.example.dummy.dto.EmployeeDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService{
@@ -26,9 +26,16 @@ public class EmployeeServiceImpl implements EmployeeService{
     }
 
     public EmployeeDTO getEmployeeById(Long id) {
-        Optional<EmployeeDTO> employee = Optional.ofNullable(employeeAPIService.getEmployeeById(id));
 
-        return employee.orElseThrow( () -> new RuntimeException("Employee not found"));
+        try {
+            return employeeAPIService.getEmployeeById(id);
+        }
+        catch (HttpClientErrorException e){
+            int statusCode = e.getRawStatusCode();
+            String statusText = e.getStatusText();
+            System.err.println("Client error - Status Code: " + statusCode + ", Status Text: " + statusText);
+            throw new HttpClientErrorException(e.getStatusCode(), statusText);
+        }
     }
 
     public List<EmployeeYearlySalaryDTO> getAllEmployeesWithYearlySalary() {
@@ -50,7 +57,4 @@ public class EmployeeServiceImpl implements EmployeeService{
         }
         return null;
     }
-
-
-
 }
